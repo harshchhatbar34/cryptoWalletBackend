@@ -49,7 +49,7 @@ export async function fetchSolanaBalance(rpcUrl: string, address: string, tokenA
 
 export async function fetchTronBalance(rpcUrl: string, address: string, tokenAddress?: string): Promise<number> {
   try {
-    const tronWeb = new TronWeb({ fullHost: rpcUrl });
+    const tronWeb = new (TronWeb as any)({ fullHost: rpcUrl });
     
     if (!tokenAddress) {
       const balanceSun = await tronWeb.trx.getBalance(address);

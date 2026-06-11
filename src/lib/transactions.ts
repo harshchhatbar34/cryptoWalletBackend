@@ -47,7 +47,7 @@ export async function transferSolanaToken(rpcUrl: string, privateKey: string, to
 }
 
 export async function transferTronToken(rpcUrl: string, privateKeyHex: string, tokenAddress: string, toAddress: string, amount: number): Promise<string> {
-  const tronWeb = new TronWeb({ fullHost: rpcUrl, privateKey: privateKeyHex });
+  const tronWeb = new (TronWeb as any)({ fullHost: rpcUrl, privateKey: privateKeyHex });
   const contract = await tronWeb.contract().at(tokenAddress);
   
   const amountSun = amount * 1e6; // USDT on TRON has 6 decimals

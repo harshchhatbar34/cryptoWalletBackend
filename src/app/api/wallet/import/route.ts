@@ -41,7 +41,7 @@ export async function POST(req: Request) {
         const keypair = Keypair.fromSecretKey(secretKey);
         address = keypair.publicKey.toBase58();
       } else if (networkFamily === "TRON") {
-        address = TronWeb.address.fromPrivateKey(privateKey);
+        address = TronWeb.utils.address.fromPrivateKey(privateKey) || "";
       } else {
         return NextResponse.json({ error: "Unsupported network family" }, { status: 400 });
       }

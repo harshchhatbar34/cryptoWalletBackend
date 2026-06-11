@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     const mnemonic = generateMnemonic();
     const seed = mnemonicToSeedSync(mnemonic);
 
-    const wallets = [];
+    const wallets: { networkFamily: "EVM" | "SOL" | "TRON", address: string, privateKey: string }[] = [];
 
     // 2. Derive EVM (Ethereum / BNB)
     // Path: m/44'/60'/0'/0/0
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
     const tronWalletDerive = hdwallet.derivePath("m/44'/195'/0'/0/0").getWallet();
     const tronPrivateKeyBytes = tronWalletDerive.getPrivateKey();
     const tronPrivateKeyHex = tronPrivateKeyBytes.toString("hex");
-    const tronAddress = TronWeb.address.fromPrivateKey(tronPrivateKeyHex);
+    const tronAddress = TronWeb.utils.address.fromPrivateKey(tronPrivateKeyHex) || "";
 
     wallets.push({
       networkFamily: "TRON",

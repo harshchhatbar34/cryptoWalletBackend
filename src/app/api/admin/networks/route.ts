@@ -12,7 +12,7 @@ async function isAdmin(req: Request): Promise<boolean> {
   if (!userId) return false;
   
   const user = await User.findById(userId);
-  return user && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+  return Boolean(user && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
 }
 
 export async function GET(req: Request) {

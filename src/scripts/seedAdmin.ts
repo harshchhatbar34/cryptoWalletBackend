@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import connectToDatabase from "./lib/mongodb";
-import { User } from "./models/User";
+import connectToDatabase from "../lib/mongodb";
+import { User } from "../models/User";
 import * as dotenv from "dotenv";
 
 dotenv.config({ path: ".env.local" });
