@@ -34,8 +34,8 @@ export async function GET(req: Request) {
 
     // For each network in DB, we find if user has a corresponding address
     for (const network of networks) {
-      // Find the corresponding token (USDT)
-      const usdtToken = tokens.find(t => t.networkId.toString() === network._id.toString() && t.symbol.toUpperCase() === "USDT");
+      // Find all tokens for this network
+      const networkTokens = tokens.filter(t => t.networkId.toString() === network._id.toString());
       
       let addressEntry = null;
       // Match network to family
@@ -49,26 +49,30 @@ export async function GET(req: Request) {
 
       if (addressEntry) {
         let nativeBalance = 0;
-        let usdtBalance = 0;
+        const tokenBalances: any[] = [];
 
         if (addressEntry.networkFamily === "EVM") {
           nativeBalance = await fetchEvmBalance(network.rpcUrl, addressEntry.address);
-          if (usdtToken) {
-            usdtBalance = await fetchEvmBalance(network.rpcUrl, addressEntry.address, usdtToken.contractAddress);
+          for (const t of networkTokens) {
+            const bal = await fetchEvmBalance(network.rpcUrl, addressEntry.address, t.contractAddress);
+            tokenBalances.push({ symbol: t.symbol, balance: bal, contractAddress: t.contractAddress });
+            if (t.symbol.toUpperCase() === "USDT") totalUsdtBalance += bal;
           }
         } else if (addressEntry.networkFamily === "SOL") {
           nativeBalance = await fetchSolanaBalance(network.rpcUrl, addressEntry.address);
-          if (usdtToken) {
-            usdtBalance = await fetchSolanaBalance(network.rpcUrl, addressEntry.address, usdtToken.contractAddress);
+          for (const t of networkTokens) {
+            const bal = await fetchSolanaBalance(network.rpcUrl, addressEntry.address, t.contractAddress);
+            tokenBalances.push({ symbol: t.symbol, balance: bal, contractAddress: t.contractAddress });
+            if (t.symbol.toUpperCase() === "USDT") totalUsdtBalance += bal;
           }
         } else if (addressEntry.networkFamily === "TRON") {
           nativeBalance = await fetchTronBalance(network.rpcUrl, addressEntry.address);
-          if (usdtToken) {
-            usdtBalance = await fetchTronBalance(network.rpcUrl, addressEntry.address, usdtToken.contractAddress);
+          for (const t of networkTokens) {
+            const bal = await fetchTronBalance(network.rpcUrl, addressEntry.address, t.contractAddress);
+            tokenBalances.push({ symbol: t.symbol, balance: bal, contractAddress: t.contractAddress });
+            if (t.symbol.toUpperCase() === "USDT") totalUsdtBalance += bal;
           }
         }
-
-        totalUsdtBalance += usdtBalance;
 
         networkBalances.push({
           networkId: network._id,
@@ -77,7 +81,7 @@ export async function GET(req: Request) {
           isTestnet: network.isTestnet,
           address: addressEntry.address,
           nativeBalance,
-          usdtBalance,
+          tokens: tokenBalances,
         });
       }
     }
